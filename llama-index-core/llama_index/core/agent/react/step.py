@@ -526,6 +526,10 @@ class ReActAgentWorker(BaseAgentWorker):
         input_chat = self._react_chat_formatter.format(
             tools,
             chat_history=task.memory.get() + task.extra_state["new_memory"].get_all(),
+            # Let LLM know that it can only take at most this many steps to complete the task.
+            # - `//2`: An observation step also takes as an iteration.
+            # - `-1`: The final output reasoning step needs to take a spot.
+            allowance=(self._max_iterations - 1) // 2,
             current_reasoning=task.extra_state["current_reasoning"],
         )
 
@@ -565,6 +569,10 @@ class ReActAgentWorker(BaseAgentWorker):
         input_chat = self._react_chat_formatter.format(
             tools,
             chat_history=task.memory.get() + task.extra_state["new_memory"].get_all(),
+            # Let LLM know that it can only take at most this many steps to complete the task.
+            # - `//2`: An observation step also takes as an iteration.
+            # - `-1`: The final output reasoning step needs to take a spot.
+            allowance=(self._max_iterations - 1) // 2,
             current_reasoning=task.extra_state["current_reasoning"],
         )
         # send prompt
@@ -603,6 +611,10 @@ class ReActAgentWorker(BaseAgentWorker):
         input_chat = self._react_chat_formatter.format(
             tools,
             chat_history=task.memory.get() + task.extra_state["new_memory"].get_all(),
+            # Let LLM know that it can only take at most this many steps to complete the task.
+            # - `//2`: An observation step also takes as an iteration.
+            # - `-1`: The final output reasoning step needs to take a spot.
+            allowance=(self._max_iterations - 1) // 2,
             current_reasoning=task.extra_state["current_reasoning"],
         )
 
@@ -674,6 +686,10 @@ class ReActAgentWorker(BaseAgentWorker):
         input_chat = self._react_chat_formatter.format(
             tools,
             chat_history=task.memory.get() + task.extra_state["new_memory"].get_all(),
+            # Let LLM know that it can only take at most this many steps to complete the task.
+            # - `//2`: An observation step also takes as an iteration.
+            # - `-1`: The final output reasoning step needs to take a spot.
+            allowance=(self._max_iterations - 1) // 2,
             current_reasoning=task.extra_state["current_reasoning"],
         )
 
