@@ -23,7 +23,11 @@ except Exception:
 @pytest.fixture(scope="session")
 def vespa_app():
     app_package: ApplicationPackage = hybrid_template
-    return VespaVectorStore(application_package=app_package, deployment_target="local")
+    try:
+        # Try getting the local instance if available
+        return VespaVectorStore(url="http://localhost", application_package=app_package, deployment_target="local")
+    except ConnectionError:
+        return VespaVectorStore(application_package=app_package, deployment_target="local")
 
 
 @pytest.fixture(scope="session")
@@ -105,7 +109,7 @@ def added_node_ids(vespa_app, nodes):
 def test_query_text_search(vespa_app, added_node_ids):
     query = VectorStoreQuery(
         query_str="Inception",  # Ensure the query matches the case used in the nodes
-        mode="text_search",
+        mode=VectorStoreQueryMode.TEXT_SEARCH,
         similarity_top_k=1,
     )
     result = vespa_app.query(query)
@@ -118,7 +122,7 @@ def test_query_text_search(vespa_app, added_node_ids):
 def test_query_vector_search(vespa_app, added_node_ids):
     query = VectorStoreQuery(
         query_str="magic, wizardry",
-        mode="semantic_hybrid",
+        mode=VectorStoreQueryMode.SEMANTIC_HYBRID,
         similarity_top_k=1,
     )
     result = vespa_app.query(query)
@@ -130,6 +134,7 @@ def test_query_vector_search(vespa_app, added_node_ids):
 
 @pytest.mark.skipif(not docker_available, reason="Docker not available")
 def test_delete_node(vespa_app, added_node_ids):
+    print("added node ids: ", added_node_ids)
     # Testing the deletion of a node
     vespa_app.delete(ref_doc_id=added_node_ids[1])
     query = VectorStoreQuery(
